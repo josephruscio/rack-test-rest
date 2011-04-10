@@ -33,7 +33,7 @@ that is testing a specific resource e.g.:
         def test_read
           create_resource(:name => "foo")
 
-          gauge = read_resource(:id => name)
+          gauge = read_resource(:id => "foo")
           assert gauge['name'] == "foo"
         end
 
