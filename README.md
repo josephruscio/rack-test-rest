@@ -34,7 +34,7 @@ that is testing a specific resource e.g.:
           create_resource(:name => "foo")
 
           gauge = read_resource(:id => name)
-          assert gauge['name'] == name
+          assert gauge['name'] == "foo"
         end
 
         def test_update
@@ -42,14 +42,14 @@ that is testing a specific resource e.g.:
 
           update_resource(:id => "foo", :description => "baz")
 
-          gauge = read_resource(:id => name)
+          gauge = read_resource(:id => "foo")
           assert gauge['description'] == "baz"
         end
 
         def test_delete
           create_resource(:name => "foo")
           delete_resource(:id => "foo")
-          read_resource(:code => 404, :id => name)
+          read_resource(:code => 404, :id => "foo")
         end
 
 `rack-test-rest` exploits _convention over configuration_ to minimize the amount of work
