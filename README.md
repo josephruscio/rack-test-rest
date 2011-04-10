@@ -95,7 +95,7 @@ e.g.
 ## Debugging
 The point of unit tests is to surface and fix defects and/or regressions in your code
 in the lab rather than than in production. When your tests fail you can include
-:debug => true` to instruct `rack-rest-test` to verbosely log to STDOUT the individual
+`:debug => true` to instruct `rack-rest-test` to verbosely log to STDOUT the individual
 HTTP requests it's performing and the results of each.
 
 ## Pagination
