@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "rack-test-rest"
   gem.homepage = "http://github.com/josephruscio/rack-test-rest"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Abstractions for testing RESTful API's with rack-test and Test::Unit.}
+  gem.description = %Q{rack-test-rest is an extension to rack-test that when combined with Test::Unit simplifies the process of unit testing properly designed RESTful API's.}
   gem.email = "joe@ruscio.org"
   gem.authors = ["Joseph Ruscio"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
