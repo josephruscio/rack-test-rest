@@ -14,13 +14,13 @@ module Rack
         post "#{resource_uri}.json", params
 
         if expected_code
-          assert last_response.status == expected_code
+          assert_equal(expected_code, last_response.status)
         else
 	  if @rack_test_rest[:debug]
             puts "#{last_response.status}: #{last_response.body}"
             puts last_response.original_headers["Location"]
 	  end
-          assert last_response.status == 201
+          assert_equal(201, last_response.status)
           if @rack_test_rest[:location]
             assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
           end
@@ -50,10 +50,10 @@ module Rack
 	end
 
         if expected_code
-          assert last_response.status == expected_code
+          assert_equal(expected_code, last_response.status)
           return nil
         else
-          assert last_response.status == 200
+          assert_equal(200, last_response.status)
           return JSON.parse(last_response.body)
         end
       end
@@ -72,9 +72,9 @@ module Rack
         puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
 
         if expected_code
-          assert last_response.status == expected_code
+          assert_equal(expected_code, last_response.status)
         else
-          assert last_response.status == 204
+          assert_equal(204, last_response.status)
         end
       end
 
@@ -82,9 +82,9 @@ module Rack
         delete "#{resource_uri}/#{params[:id]}.json"
 
         if params[:code]
-          assert last_response.status == params[:code]
+          assert_equal(params[:code], last_response.status)
         else
-          assert last_response.status == 204
+          assert_equal(204, last_response.status)
         end
       end
 
@@ -115,14 +115,14 @@ module Rack
 	  pg_resp = read_resource(:offset => offset, :length => length)
 
           puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
-          assert pg_resp[@rack_test_rest[:resource]].count == expected_length
+          assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
 
           puts "Found #{pg_resp["query"]["found"]} records" if @rack_test_rest[:debug]
-          assert pg_resp["query"]["found"] == count
+          assert_equal(count, pg_resp["query"]["found"])
 
-          assert pg_resp["query"]["total"] == count
-          assert pg_resp["query"]["length"] == expected_length
-          assert pg_resp["query"]["offset"] == offset
+          assert_equal(count, pg_resp["query"]["total"])
+          assert_equal(expected_length, pg_resp["query"]["length"])
+          assert_equal(offset, pg_resp["query"]["offset"])
 
           retrieved += expected_length
           offset = retrieved
