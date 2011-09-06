@@ -3,7 +3,7 @@ module Rack
     module Rest
 
       def resource_uri
-	"#{@rack_test_rest[:root_uri]}/#{@rack_test_rest[:resource]}"
+        "#{@rack_test_rest[:root_uri]}/#{@rack_test_rest[:resource]}"
       end
 
       def create_resource(params={})
@@ -16,10 +16,10 @@ module Rack
         if expected_code
           assert_equal(expected_code, last_response.status)
         else
-	  if @rack_test_rest[:debug]
+          if @rack_test_rest[:debug]
             puts "#{last_response.status}: #{last_response.body}"
             puts last_response.original_headers["Location"]
-	  end
+          end
           assert_equal(201, last_response.status)
           if @rack_test_rest[:location]
             assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
@@ -33,13 +33,13 @@ module Rack
         expected_code = params[:code]
         params.delete :code
 
-	if params[:id]
+        if params[:id]
           id = params[:id]
           params.delete(:id)
-	  uri = resource_uri + "/#{id}.json"
-	else
-	  uri = resource_uri + ".json"
-	end
+          uri = resource_uri + "/#{id}.json"
+        else
+          uri = resource_uri + ".json"
+        end
 
         puts "GET #{uri} #{params}" if @rack_test_rest[:debug]
         get uri, params
@@ -47,7 +47,7 @@ module Rack
         if @rack_test_rest[:debug]
           puts "Code: #{last_response.status}"
           puts "Body: #{last_response.body}"
-	end
+        end
 
         if expected_code
           assert_equal(expected_code, last_response.status)
@@ -116,7 +116,7 @@ module Rack
             puts "Expecting '#{expected_length}'"
           end
 
-	  pg_resp = read_resource(:offset => offset, :length => length)
+          pg_resp = read_resource(:offset => offset, :length => length)
 
           puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
           assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
