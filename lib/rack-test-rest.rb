@@ -95,7 +95,11 @@ module Rack
 
         #populate the DB
         0.upto(count - 1) do |id|
-          create_resource(yield(id))
+          if params.has_key?(:do_create) && params[:do_create] == false
+            yield(id)
+          else
+            create_resource(yield(id))
+          end
         end
 
         retrieved = 0
