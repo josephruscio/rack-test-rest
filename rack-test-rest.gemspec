@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/josephruscio/rack-test-rest}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.4.2}
+  s.rubygems_version = %q{1.6.2}
   s.summary = %q{Abstractions for testing RESTful API's with rack-test and Test::Unit.}
   s.test_files = [
     "test/helper.rb",
