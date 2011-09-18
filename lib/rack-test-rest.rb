@@ -11,7 +11,7 @@ module Rack
         params.delete :code
 
         puts "Posting to: '#{resource_uri}.json'" if @rack_test_rest[:debug]
-        post "#{resource_uri}.json", params
+        post "#{resource_uri}#{@rack_test_rest[:extention]}", params
 
         if expected_code
           assert_equal(expected_code, last_response.status)
@@ -36,9 +36,9 @@ module Rack
         if params[:id]
           id = params[:id]
           params.delete(:id)
-          uri = resource_uri + "/#{id}.json"
+          uri = "#{resource_uri}/#{id}#{@rack_test_rest[:extention]}"
         else
-          uri = resource_uri + ".json"
+          uri = "#{resource_uri}#{@rack_test_rest[:extention]}"
         end
 
         puts "GET #{uri} #{params}" if @rack_test_rest[:debug]
@@ -67,7 +67,7 @@ module Rack
 
         puts "Attempting to update #{id} with #{params}" if @rack_test_rest[:debug]
 
-        put "#{resource_uri}/#{id}.json", params
+        put "#{resource_uri}/#{id}#{@rack_test_rest[:extention]}", params
 
         puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
 
@@ -79,7 +79,7 @@ module Rack
       end
 
       def delete_resource(params={})
-        delete "#{resource_uri}/#{params[:id]}.json"
+        delete "#{resource_uri}/#{params[:id]}#{@rack_test_rest[:extention]}"
 
         if params[:code]
           assert_equal(params[:code], last_response.status)

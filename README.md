@@ -21,7 +21,8 @@ that is testing a specific resource e.g.:
           @rack_test_rest = {
             #:debug => true,
             :root_uri => "/v1/metrics",
-            :resource => "gauges"
+            :resource => "gauges",
+            :extention => ".json" #other possibilities ".xml", "_json",".html", etc
           }
         end
 
@@ -57,12 +58,12 @@ required to test any particular resource. You need only specify `:root_uri` and 
 in your test setup (through the `@rack_test_rest` instance variable). These are combined
 to create either the URI for creating/indexing resources or the URI for a particular resource:
 
-    :root_uri + '/' + :resource + '.json'
-    :root_uri + '/' + :resource + '/' + params[:id].to_s + '.json'
+    :root_uri + '/' + :resource + :extention
+    :root_uri + '/' + :resource + '/' + params[:id].to_s + :extention
 
 ## `create_resource(params={})`
 
-Performs a POST to with any specified parameters to `:root_uri/:resource.json`
+Performs a POST to with any specified parameters to `:root_uri/:resource:extention`
 and ensures that it returns `201`. Returns the string value found in the response's
 `Location` header.
 
@@ -70,18 +71,18 @@ and ensures that it returns `201`. Returns the string value found in the respons
 
 Performs a GET with any specified parameters and validates that it returns `200`.
 If `:id` is specified the GET is performed against a singular resource i.e.
-`:root_uri/:resource/:id.json`. In the absence of `:id` the GET is performed
-as an index operation against `:root_uri/:resource.json`. Returns parsed
+`:root_uri/:resource/:id:extention`. In the absence of `:id` the GET is performed
+as an index operation against `:root_uri/:resource:extention`. Returns parsed
 JSON of the response body on a `200`.
 
 ## `update_resource(params={})`
 
-Requires an :id parameter. Performs a PUT against `:root_uri/:resource/:id.json`
+Requires an :id parameter. Performs a PUT against `:root_uri/:resource/:id:extention`
 with any other specified parameters and asserts that it returns `204`.
 
 ## `delete_resource(params={})`
 
-Requires an :id parameter. Performs a DELETE against `:root_uri/:resource/:id.json`
+Requires an :id parameter. Performs a DELETE against `:root_uri/:resource/:id:extention`
 and asserts that it returns `204`.
 
 ## Testing invalid input
