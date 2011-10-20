@@ -6,6 +6,25 @@ module Rack
         "#{@rack_test_rest[:root_uri]}/#{@rack_test_rest[:resource]}"
       end
 
+      def handle_error_code(code)
+        assert_equal(code, last_response.status)
+
+        if @rack_test_rest[:debug]
+          puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
+          puts "Headers:"
+          puts last_response.headers.inspect
+          puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
+        end
+
+        assert_equal 'application/json', last_response.headers['Content-Type']
+
+        if last_response.headers['Content-Length'].to_i > 0
+          JSON.parse(last_response.body)
+        else
+          nil
+        end
+      end
+
       def create_resource(params={})
         expected_code = params[:code]
         params.delete :code
@@ -13,17 +32,18 @@ module Rack
         puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
 
-        if expected_code
-          assert_equal(expected_code, last_response.status)
-        else
-          if @rack_test_rest[:debug]
-            puts "#{last_response.status}: #{last_response.body}"
-            puts last_response.original_headers["Location"]
-          end
-          assert_equal(201, last_response.status)
-          if @rack_test_rest[:location]
-            assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
-          end
+        return handle_error_code(expected_code) if expected_code
+
+        if @rack_test_rest[:debug]
+          puts "#{last_response.status}: #{last_response.body}"
+          puts last_response.original_headers["Location"]
+        end
+
+        assert_equal(201, last_response.status)
+        assert_equal 'application/json', last_response.headers['Content-Type']
+
+        if @rack_test_rest[:location]
+          assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
         end
 
         last_response.original_headers["Location"]
@@ -44,18 +64,17 @@ module Rack
         puts "GET #{uri} #{params}" if @rack_test_rest[:debug]
         get uri, params
 
+        return handle_error_code(expected_code) if expected_code
+
         if @rack_test_rest[:debug]
           puts "Code: #{last_response.status}"
           puts "Body: #{last_response.body}"
         end
 
-        if expected_code
-          assert_equal(expected_code, last_response.status)
-          return nil
-        else
-          assert_equal(200, last_response.status)
-          return JSON.parse(last_response.body)
-        end
+        assert_equal 'application/json', last_response.headers['Content-Type']
+        assert_equal(200, last_response.status)
+
+        JSON.parse(last_response.body)
       end
 
       def update_resource(params={})
@@ -69,23 +88,19 @@ module Rack
 
         put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
+        return handle_error_code(expected_code) if expected_code
+
         puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
 
-        if expected_code
-          assert_equal(expected_code, last_response.status)
-        else
-          assert_equal(204, last_response.status)
-        end
+        assert_equal(204, last_response.status)
       end
 
       def delete_resource(params={})
         delete "#{resource_uri}/#{params[:id]}#{@rack_test_rest[:extension]}"
 
-        if params[:code]
-          assert_equal(params[:code], last_response.status)
-        else
-          assert_equal(204, last_response.status)
-        end
+        return handle_error_code(params[:code]) if params[:code]
+
+        assert_equal(204, last_response.status)
       end
 
       def paginate_resource(params={})
