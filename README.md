@@ -61,6 +61,8 @@ to create either the URI for creating/indexing resources or the URI for a partic
     :root_uri + '/' + :resource + :extension
     :root_uri + '/' + :resource + '/' + params[:id].to_s + :extension
 
+Currently JSON is the only supported response Content-Type.
+
 ## `create_resource(params={})`
 
 Performs a POST to with any specified parameters to `:root_uri/:resource:extension`
