@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{rack-test-rest}
-  s.version = "0.3.0"
+  s.name = "rack-test-rest"
+  s.version = "0.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Joseph Ruscio"]
-  s.date = %q{2011-10-02}
-  s.description = %q{rack-test-rest is an extension to rack-test that when combined with Test::Unit simplifies the process of unit testing properly designed RESTful API's.}
-  s.email = %q{joe@ruscio.org}
+  s.date = "2011-10-20"
+  s.description = "rack-test-rest is an extension to rack-test that when combined with Test::Unit simplifies the process of unit testing properly designed RESTful API's."
+  s.email = "joe@ruscio.org"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
@@ -29,11 +29,11 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_rack-test-rest.rb"
   ]
-  s.homepage = %q{http://github.com/josephruscio/rack-test-rest}
+  s.homepage = "http://github.com/josephruscio/rack-test-rest"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.6.2}
-  s.summary = %q{Abstractions for testing RESTful API's with rack-test and Test::Unit.}
+  s.rubygems_version = "1.8.10"
+  s.summary = "Abstractions for testing RESTful API's with rack-test and Test::Unit."
   s.test_files = [
     "test/helper.rb",
     "test/test_rack-test-rest.rb"
