@@ -61,7 +61,7 @@ module Rack
           uri = "#{resource_uri}#{@rack_test_rest[:extension]}"
         end
 
-        puts "GET #{uri} #{params}" if @rack_test_rest[:debug]
+        puts "GET #{uri} #{params.pretty_inspect}" if @rack_test_rest[:debug]
         get uri, params
 
         return handle_error_code(expected_code) if expected_code
@@ -84,7 +84,7 @@ module Rack
         id = params[:id]
         params.delete(:id)
 
-        puts "Attempting to update #{id} with #{params}" if @rack_test_rest[:debug]
+        puts "Attempting to update #{id} with #{params.pretty_inspect}" if @rack_test_rest[:debug]
 
         put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
