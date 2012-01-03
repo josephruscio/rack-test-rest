@@ -15,8 +15,7 @@ module Rack
           puts last_response.headers.inspect
           puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
         end
-
-        assert_equal 'application/json', last_response.headers['Content-Type']
+        assert_content_type_is_json(last_response)
 
         if last_response.headers['Content-Length'].to_i > 0
           JSON.parse(last_response.body)
@@ -40,7 +39,7 @@ module Rack
         end
 
         assert_equal(201, last_response.status)
-        assert_equal 'application/json', last_response.headers['Content-Type']
+        assert_content_type_is_json(last_response)
 
         if @rack_test_rest[:location]
           assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
@@ -71,7 +70,7 @@ module Rack
           puts "Body: #{last_response.body}"
         end
 
-        assert_equal 'application/json', last_response.headers['Content-Type']
+        assert_content_type_is_json(last_response)
         assert_equal(200, last_response.status)
 
         JSON.parse(last_response.body)
@@ -146,6 +145,14 @@ module Rack
           retrieved += expected_length
           offset = retrieved
         end
+      end
+
+    private
+
+      def assert_content_type_is_json(response)
+        # ignore character sets when evaluating content type
+        content_type = response.headers['Content-Type'].split(';')[0].strip.downcase
+        assert_equal 'application/json', content_type
       end
 
     end
