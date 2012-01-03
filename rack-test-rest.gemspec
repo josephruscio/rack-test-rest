@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "rack-test-rest"
-  s.version = "0.4.2"
+  s.version = "0.4.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Joseph Ruscio"]
-  s.date = "2011-12-12"
+  s.date = "2012-01-03"
   s.description = "rack-test-rest is an extension to rack-test that when combined with Test::Unit simplifies the process of unit testing properly designed RESTful API's."
   s.email = "joe@ruscio.org"
   s.extra_rdoc_files = [
@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/josephruscio/rack-test-rest"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.12"
   s.summary = "Abstractions for testing RESTful API's with rack-test and Test::Unit."
   s.test_files = [
     "test/helper.rb",
