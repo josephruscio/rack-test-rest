@@ -1,3 +1,5 @@
+require 'pp'
+
 module Rack
   module Test
     module Rest
