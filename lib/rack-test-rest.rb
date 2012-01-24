@@ -9,7 +9,8 @@ module Rack
       end
 
       def handle_error_code(code)
-        assert_equal(code, last_response.status)
+        assert_equal code, last_response.status,
+          "Expected #{code}, got #{last_response.status} - body #{last_response.body.empty? ? "empty" : last_response.body.pretty_inspect.chomp}"
 
         if @rack_test_rest[:debug]
           puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
