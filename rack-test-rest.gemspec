@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "rack-test-rest"
-  s.version = "0.4.4"
+  s.version = "0.4.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Joseph Ruscio"]
-  s.date = "2012-01-09"
+  s.date = "2012-03-13"
   s.description = "rack-test-rest is an extension to rack-test that when combined with Test::Unit simplifies the process of unit testing properly designed RESTful API's."
   s.email = "joe@ruscio.org"
   s.extra_rdoc_files = [
