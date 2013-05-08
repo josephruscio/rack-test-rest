@@ -178,7 +178,7 @@ module Rack
 
       def assert_status_code(code, response=last_response)
         assert_equal code, response.status,
-          "Expected status #{code}, but got a #{last_response.status}; body: #{last_response.body.empty? ? "empty" : last_response.body.inspect.chomp}"
+          "Expected status #{code}, but got a #{last_response.status}.\nBody: #{last_response.body.empty? ? "empty" : last_response.body.inspect.chomp}"
       end
 
     end
