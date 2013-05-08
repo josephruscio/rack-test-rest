@@ -1,5 +1,3 @@
-require 'pp'
-
 module Rack
   module Test
     module Rest
@@ -76,7 +74,7 @@ module Rack
           uri = "#{resource_uri}#{@rack_test_rest[:extension]}"
         end
 
-        puts "GET #{uri} #{params.pretty_inspect}" if @rack_test_rest[:debug]
+        puts "GET #{uri} #{params.inspect}" if @rack_test_rest[:debug]
         get uri, params
 
         with_clean_backtraces do
@@ -103,7 +101,7 @@ module Rack
         id = params[:id]
         params.delete(:id)
 
-        puts "Attempting to update #{id} with #{params.pretty_inspect}" if @rack_test_rest[:debug]
+        puts "Attempting to update #{id} with #{params.inspect}" if @rack_test_rest[:debug]
 
         put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
@@ -180,7 +178,7 @@ module Rack
 
       def assert_status_code(code, response=last_response)
         assert_equal code, response.status,
-          "Expected status #{code}, but got a #{last_response.status}; body: #{last_response.body.empty? ? "empty" : last_response.body.pretty_inspect.chomp}"
+          "Expected status #{code}, but got a #{last_response.status}; body: #{last_response.body.empty? ? "empty" : last_response.body.inspect.chomp}"
       end
 
     end
