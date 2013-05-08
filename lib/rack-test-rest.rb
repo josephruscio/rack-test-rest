@@ -1,5 +1,3 @@
-require 'pp'
-
 module Rack
   module Test
     module Rest
@@ -9,8 +7,7 @@ module Rack
       end
 
       def handle_error_code(code)
-        assert_equal code, last_response.status,
-          "Expected #{code}, got #{last_response.status} - body #{last_response.body.empty? ? "empty" : last_response.body.pretty_inspect.chomp}"
+        assert_status_code(code)
 
         if @rack_test_rest[:debug]
           puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
@@ -18,13 +15,23 @@ module Rack
           puts last_response.headers.inspect
           puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
         end
-        assert_content_type_is_json(last_response)
+        assert_content_type_is_json
 
         if last_response.headers['Content-Length'].to_i > 0
           JSON.parse(last_response.body)
         else
           nil
         end
+      end
+
+      # remove library lines from call stack so error is reported
+      # where the call to rack-test-rest is being made
+      def with_clean_backtraces
+        yield
+      rescue MiniTest::Assertion => error
+        cleaned = error.backtrace.reject {|l| l.index('rack-test-rest/lib')}
+        error.set_backtrace(cleaned)
+        raise
       end
 
       def create_resource(params={})
@@ -34,18 +41,22 @@ module Rack
         puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
 
-        return handle_error_code(expected_code) if expected_code
+        with_clean_backtraces do
 
-        if @rack_test_rest[:debug]
-          puts "#{last_response.status}: #{last_response.body}"
-          puts last_response.original_headers["Location"]
-        end
+          return handle_error_code(expected_code) if expected_code
 
-        assert_equal(201, last_response.status)
-        assert_content_type_is_json(last_response)
+          if @rack_test_rest[:debug]
+            puts "#{last_response.status}: #{last_response.body}"
+            puts last_response.original_headers["Location"]
+          end
 
-        if @rack_test_rest[:location]
-          assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
+          assert_status_code(201)
+          assert_content_type_is_json
+
+          if @rack_test_rest[:location]
+            assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
+          end
+
         end
 
         last_response.original_headers["Location"]
@@ -63,18 +74,22 @@ module Rack
           uri = "#{resource_uri}#{@rack_test_rest[:extension]}"
         end
 
-        puts "GET #{uri} #{params.pretty_inspect}" if @rack_test_rest[:debug]
+        puts "GET #{uri} #{params.inspect}" if @rack_test_rest[:debug]
         get uri, params
 
-        return handle_error_code(expected_code) if expected_code
+        with_clean_backtraces do
 
-        if @rack_test_rest[:debug]
-          puts "Code: #{last_response.status}"
-          puts "Body: #{last_response.body}"
+          return handle_error_code(expected_code) if expected_code
+
+          if @rack_test_rest[:debug]
+            puts "Code: #{last_response.status}"
+            puts "Body: #{last_response.body}"
+          end
+
+          assert_status_code(200)
+          assert_content_type_is_json
+
         end
-
-        assert_content_type_is_json(last_response)
-        assert_equal(200, last_response.status)
 
         JSON.parse(last_response.body)
       end
@@ -86,23 +101,24 @@ module Rack
         id = params[:id]
         params.delete(:id)
 
-        puts "Attempting to update #{id} with #{params.pretty_inspect}" if @rack_test_rest[:debug]
+        puts "Attempting to update #{id} with #{params.inspect}" if @rack_test_rest[:debug]
 
         put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
-        return handle_error_code(expected_code) if expected_code
-
-        puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
-
-        assert_equal(204, last_response.status)
+        with_clean_backtraces do
+          return handle_error_code(expected_code) if expected_code
+          puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
+          assert_status_code(204)
+        end
       end
 
       def delete_resource(params={})
         delete "#{resource_uri}/#{params[:id]}#{@rack_test_rest[:extension]}"
 
-        return handle_error_code(params[:code]) if params[:code]
-
-        assert_equal(204, last_response.status)
+        with_clean_backtraces do
+          return handle_error_code(params[:code]) if params[:code]
+          assert_status_code(204)
+        end
       end
 
       def paginate_resource(params={})
@@ -135,27 +151,34 @@ module Rack
 
           pg_resp = read_resource(:offset => offset, :length => length)
 
-          puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
-          assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
+          with_clean_backtraces do
+            puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
+            assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
 
-          puts "Found #{pg_resp["query"]["found"]} records" if @rack_test_rest[:debug]
-          assert_equal(count, pg_resp["query"]["found"])
+            puts "Found #{pg_resp["query"]["found"]} records" if @rack_test_rest[:debug]
+            assert_equal(count, pg_resp["query"]["found"])
 
-          assert_equal(count, pg_resp["query"]["total"])
-          assert_equal(expected_length, pg_resp["query"]["length"])
-          assert_equal(offset, pg_resp["query"]["offset"])
+            assert_equal(count, pg_resp["query"]["total"])
+            assert_equal(expected_length, pg_resp["query"]["length"])
+            assert_equal(offset, pg_resp["query"]["offset"])
 
-          retrieved += expected_length
-          offset = retrieved
+            retrieved += expected_length
+            offset = retrieved
+          end
         end
       end
 
     private
 
-      def assert_content_type_is_json(response)
+      def assert_content_type_is_json(response=last_response)
         # ignore character sets when evaluating content type
         content_type = response.headers['Content-Type'].split(';')[0].strip.downcase
-        assert_equal 'application/json', content_type
+        assert_equal 'application/json', content_type, 'Expected content type to be json'
+      end
+
+      def assert_status_code(code, response=last_response)
+        assert_equal code, response.status,
+          "Expected status #{code}, but got a #{last_response.status}.\nBody: #{last_response.body.empty? ? "empty" : last_response.body.inspect.chomp}"
       end
 
     end
