@@ -126,5 +126,5 @@ that a single index operation may return (defaults to 100).
 
 # Copyright
 
-Copyright (c) 2011 Joseph Ruscio. See LICENSE.txt for
+Copyright (c) 2011-2013 Joseph Ruscio. See LICENSE.txt for
 further details.
