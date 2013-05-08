@@ -9,8 +9,7 @@ module Rack
       end
 
       def handle_error_code(code)
-        assert_equal code, last_response.status,
-          "Expected #{code}, got #{last_response.status} - body #{last_response.body.empty? ? "empty" : last_response.body.pretty_inspect.chomp}"
+        assert_status_code(code)
 
         if @rack_test_rest[:debug]
           puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
@@ -18,7 +17,7 @@ module Rack
           puts last_response.headers.inspect
           puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
         end
-        assert_content_type_is_json(last_response)
+        assert_content_type_is_json
 
         if last_response.headers['Content-Length'].to_i > 0
           JSON.parse(last_response.body)
@@ -53,8 +52,8 @@ module Rack
             puts last_response.original_headers["Location"]
           end
 
-          assert_equal(201, last_response.status)
-          assert_content_type_is_json(last_response)
+          assert_status_code(201)
+          assert_content_type_is_json
 
           if @rack_test_rest[:location]
             assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
@@ -89,8 +88,8 @@ module Rack
             puts "Body: #{last_response.body}"
           end
 
-          assert_content_type_is_json(last_response)
-          assert_equal(200, last_response.status)
+          assert_status_code(200)
+          assert_content_type_is_json
 
         end
 
@@ -111,7 +110,7 @@ module Rack
         with_clean_backtraces do
           return handle_error_code(expected_code) if expected_code
           puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
-          assert_equal(204, last_response.status)
+          assert_status_code(204)
         end
       end
 
@@ -120,7 +119,7 @@ module Rack
 
         with_clean_backtraces do
           return handle_error_code(params[:code]) if params[:code]
-          assert_equal(204, last_response.status)
+          assert_status_code(204)
         end
       end
 
@@ -173,10 +172,15 @@ module Rack
 
     private
 
-      def assert_content_type_is_json(response)
+      def assert_content_type_is_json(response=last_response)
         # ignore character sets when evaluating content type
         content_type = response.headers['Content-Type'].split(';')[0].strip.downcase
-        assert_equal 'application/json', content_type
+        assert_equal 'application/json', content_type, 'Expected content type to be json'
+      end
+
+      def assert_status_code(code, response=last_response)
+        assert_equal code, response.status,
+          "Expected status #{code}, but got a #{last_response.status}; body: #{last_response.body.empty? ? "empty" : last_response.body.pretty_inspect.chomp}"
       end
 
     end
