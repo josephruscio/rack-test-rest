@@ -29,7 +29,7 @@ module Rack
       def with_clean_backtraces
         yield
       rescue MiniTest::Assertion => error
-        cleaned = error.backtrace.reject {|l| l.index('rack-test-rest/lib')}
+        cleaned = error.backtrace.reject {|l| l.index(/rack-test-rest[-.0-9]{0,}\/lib/)}
         error.set_backtrace(cleaned)
         raise
       end
