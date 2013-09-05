@@ -1,3 +1,5 @@
+require 'rack-test-rest/version'
+
 module Rack
   module Test
     module Rest
