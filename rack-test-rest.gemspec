@@ -8,37 +8,25 @@ Gem::Specification.new do |s|
   s.version = "0.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Joseph Ruscio"]
-  s.date = "2013-05-08"
-  s.description = "rack-test-rest is an extension to rack-test that when combined with Test::Unit simplifies the process of unit testing properly designed RESTful API's."
-  s.email = "joe@ruscio.org"
+  s.rubygems_version = "1.8.25"
+
+  s.authors     = ["Joseph Ruscio"]
+  s.email       = 'joe@ruscio.org'
+  s.homepage    = 'https://github.com/josephruscio/rack-test-rest'
+  s.license     = 'MIT'
+
+  s.summary     = "Easy testing of RESTful API's with rack-test and Test::Unit."
+  s.description = "Extends rack-test to simplifies the process of unit testing properly designed RESTful API's."
+
+  s.files = Dir["{app,config,db,lib}/**/*"] + ["LICENSE.txt", "Rakefile", "README.md"]
+  s.test_files = Dir["test/**/*"]
+
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
   ]
-  s.files = [
-    ".document",
-    "Gemfile",
-    "Gemfile.lock",
-    "LICENSE.txt",
-    "README.md",
-    "Rakefile",
-    "VERSION",
-    "lib/rack-test-rest.rb",
-    "rack-test-rest.gemspec",
-    "test/helper.rb",
-    "test/test_rack-test-rest.rb"
-  ]
-  s.homepage = "http://github.com/josephruscio/rack-test-rest"
-  s.licenses = ["MIT"]
-  s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.25"
-  s.summary = "Abstractions for testing RESTful API's with rack-test and Test::Unit."
-  s.test_files = [
-    "test/helper.rb",
-    "test/test_rack-test-rest.rb"
-  ]
 
+  s.add_development_dependency 'rake'
   s.add_development_dependency 'shoulda'
 end
 
