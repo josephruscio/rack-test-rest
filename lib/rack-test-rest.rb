@@ -125,28 +125,30 @@ module Rack
         end
       end
 
-      def paginate_resource(params={})
+      def paginate_resource(opts={})
 
-        count = params[:count] ? params[:count] : 512
-        max = params[:max_length] ? params[:max_length] : 100
+        count = opts[:count] ? opts[:count] : 512
+        max = opts[:max_length] ? opts[:max_length] : 100
+        existing_resource_count = opts[:existing_resource_count] || 0
 
         #populate the DB
         0.upto(count - 1) do |id|
-          if params.has_key?(:do_create) && params[:do_create] == false
+          if opts[:do_create] == false
             yield(id)
           else
             create_resource(yield(id))
           end
         end
 
+        total = count + existing_resource_count
         retrieved = 0
         offset = 0
 
-        while retrieved < count
+        while retrieved < total
           # Get a random number from 1-100
           length = rand(max - 1) + 1
 
-          expected_length = (length > (count - retrieved)) ? (count - retrieved) : length
+          expected_length = (length > (total - retrieved)) ? (total - retrieved) : length
 
           if @rack_test_rest[:debug]
             puts "Requesting offset='#{offset}', length='#{length}'"
@@ -160,9 +162,9 @@ module Rack
             assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
 
             puts "Found #{pg_resp["query"]["found"]} records" if @rack_test_rest[:debug]
-            assert_equal(count, pg_resp["query"]["found"])
+            assert_equal(total, pg_resp["query"]["found"])
 
-            assert_equal(count, pg_resp["query"]["total"])
+            assert_equal(total, pg_resp["query"]["total"])
             assert_equal(expected_length, pg_resp["query"]["length"])
             assert_equal(offset, pg_resp["query"]["offset"])
 
