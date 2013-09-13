@@ -56,7 +56,9 @@ module Rack
           assert_content_type_is_json
 
           if @rack_test_rest[:location]
-            assert last_response.original_headers["Location"] =~ @rack_test_rest[:location]
+            assert last_response.original_headers["Location"] =~ @rack_test_rest[:location],
+              "Response location header '%s' does not match RegExp '%s'" %
+              [last_response.original_headers["Location"], @rack_test_rest[:location]]
           end
 
         end
