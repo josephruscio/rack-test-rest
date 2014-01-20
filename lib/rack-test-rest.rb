@@ -163,10 +163,10 @@ module Rack
         assert_status_code(code)
 
         if @rack_test_rest[:debug]
-          puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
+          puts "Status: #{last_response.status}"
           puts "Headers:"
           puts last_response.headers.inspect
-          puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
+          puts "Body: #{last_response.body}"
         end
         assert_content_type_is_json
 
