@@ -8,34 +8,6 @@ module Rack
         "#{@rack_test_rest[:root_uri]}/#{@rack_test_rest[:resource]}"
       end
 
-      def handle_error_code(code)
-        assert_status_code(code)
-
-        if @rack_test_rest[:debug]
-          puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
-          puts "Headers:"
-          puts last_response.headers.inspect
-          puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
-        end
-        assert_content_type_is_json
-
-        if last_response.headers['Content-Length'].to_i > 0
-          JSON.parse(last_response.body)
-        else
-          nil
-        end
-      end
-
-      # remove library lines from call stack so error is reported
-      # where the call to rack-test-rest is being made
-      def with_clean_backtraces
-        yield
-      rescue MiniTest::Assertion => error
-        cleaned = error.backtrace.reject {|l| l.index(/rack-test-rest[-.0-9]{0,}\/lib/)}
-        error.set_backtrace(cleaned)
-        raise
-      end
-
       def create_resource(params={})
         expected_code = params[:code]
         params.delete :code
@@ -185,6 +157,36 @@ module Rack
       def assert_status_code(code, response=last_response)
         assert_equal code, response.status,
           "Expected status #{code}, but got a #{last_response.status}.\nBody: #{last_response.body.empty? ? "empty" : last_response.body.inspect.chomp}"
+      end
+
+      def handle_error_code(code)
+        assert_status_code(code)
+
+        if @rack_test_rest[:debug]
+          puts "Status: #{last_response.status}" if @rack_test_rest[:debug]
+          puts "Headers:"
+          puts last_response.headers.inspect
+          puts "Body: #{last_response.body}" if @rack_test_rest[:debug]
+        end
+        assert_content_type_is_json
+
+        if last_response.headers['Content-Length'].to_i > 0
+          JSON.parse(last_response.body)
+        else
+          nil
+        end
+      end
+
+      # remove library lines from call stack so error is reported
+      # where the call to rack-test-rest is being made
+      def with_clean_backtraces
+        yield
+      rescue MiniTest::Assertion => error
+        cleaned = error.backtrace.reject do |line|
+          line.index(/rack-test-rest[-.0-9]{0,}\/lib/)
+        end
+        error.set_backtrace(cleaned)
+        raise
       end
 
     end
