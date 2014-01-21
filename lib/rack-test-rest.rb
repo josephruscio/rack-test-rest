@@ -43,6 +43,13 @@ module Rack
         last_response.original_headers["Location"]
       end
 
+      # create resource, but expect a 400 - helper for the common case
+      # of testing invalid parameters for creating your resource.
+      #
+      def create_invalid_resource(opts)
+        create_resource({code: 400}.merge(opts))
+      end
+
       def read_resource(params={})
         id = params.delete(:id)
         expected_code = params.delete(:code)
