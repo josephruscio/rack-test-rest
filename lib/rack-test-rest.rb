@@ -4,13 +4,18 @@ module Rack
   module Test
     module Rest
 
+      # defines expected resource-to-uri scheme. overload this in your class
+      # if needed.
+      #
       def resource_uri
         "#{@rack_test_rest[:root_uri]}/#{@rack_test_rest[:resource]}"
       end
 
+      # create a new instance of the given resource, expecting a 201
+      # unless the :code option is specified.
+      #
       def create_resource(params={})
-        expected_code = params[:code]
-        params.delete :code
+        expected_code = params.delete(:code)
 
         puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
@@ -39,12 +44,10 @@ module Rack
       end
 
       def read_resource(params={})
-        expected_code = params[:code]
-        params.delete :code
+        id = params.delete(:id)
+        expected_code = params.delete(:code)
 
-        if params[:id]
-          id = params[:id]
-          params.delete(:id)
+        if id
           uri = "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
         else
           uri = "#{resource_uri}#{@rack_test_rest[:extension]}"
@@ -71,11 +74,8 @@ module Rack
       end
 
       def update_resource(params={})
-        expected_code = params[:code]
-        params.delete :code
-
-        id = params[:id]
-        params.delete(:id)
+        id = params.delete(:id)
+        expected_code = params.delete(:code)
 
         puts "Attempting to update #{id} with #{params.inspect}" if @rack_test_rest[:debug]
 
