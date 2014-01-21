@@ -1,3 +1,5 @@
+[![Gem Version](https://badge.fury.io/rb/rack-test-rest.png)](http://badge.fury.io/rb/rack-test-rest)
+
 `rack-test-rest` is an extension to `rack-test` that when combined with
 `Test::Unit` simplifies the process of unit testing properly
 designed RESTful API's.
