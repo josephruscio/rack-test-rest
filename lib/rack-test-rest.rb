@@ -97,22 +97,26 @@ module Rack
         end
       end
 
+      # Create a set number of the resource and test pagination up
+      # to that number.
+      #
       def paginate_resource(opts={})
-
-        count = opts[:count] ? opts[:count] : 512
-        max = opts[:max_length] ? opts[:max_length] : 100
-        existing_resource_count = opts[:existing_resource_count] || 0
+        count       = opts.fetch(:count, 512)
+        do_create   = opts.fetch(:do_create, true)
+        max         = opts.fetch(:max_length, 100)
+        read_params = opts.fetch(:read_params, {})
+        start_count = opts.fetch(:existing_resource_count, 0)
 
         #populate the DB
         0.upto(count - 1) do |id|
-          if opts[:do_create] == false
-            yield(id)
-          else
+          if do_create
             create_resource(yield(id))
+          else
+            yield(id)
           end
         end
 
-        total = count + existing_resource_count
+        total = count + start_count
         retrieved = 0
         offset = 0
 
@@ -127,7 +131,8 @@ module Rack
             puts "Expecting '#{expected_length}'"
           end
 
-          pg_resp = read_resource(:offset => offset, :length => length)
+          get_params = read_params.merge(offset: offset, length: length)
+          pg_resp = read_resource(get_params)
 
           with_clean_backtraces do
             puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
