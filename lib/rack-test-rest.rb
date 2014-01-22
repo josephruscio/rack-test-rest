@@ -46,7 +46,7 @@ module Rack
       # create resource, but expect a 400 - helper for the common case
       # of testing invalid parameters for creating your resource.
       #
-      def create_invalid_resource(opts)
+      def create_resource_invalid(opts)
         create_resource({code: 400}.merge(opts))
       end
 
@@ -93,6 +93,13 @@ module Rack
           puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
           assert_status_code(204)
         end
+      end
+
+      # update resource, but expect a 400 - helper for the common case
+      # of testing invalid parameters for updating your resource.
+      #
+      def update_resource_invalid(opts)
+        update_resource({code: 400}.merge(opts))
       end
 
       def delete_resource(params={})
