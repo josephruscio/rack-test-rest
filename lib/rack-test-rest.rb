@@ -16,7 +16,7 @@ module Rack
       # unless the :code option is specified.
       #
       def create_resource(params={})
-        expected_code = params.delete(:code)
+        id, expected_code, params = _rtr_prepare_params(params)
 
         puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
@@ -52,8 +52,7 @@ module Rack
       end
 
       def read_resource(params={})
-        id = params.delete(:id)
-        expected_code = params.delete(:code)
+        id, expected_code, params = _rtr_prepare_params(params)
 
         if id
           uri = "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
@@ -82,8 +81,7 @@ module Rack
       end
 
       def update_resource(params={})
-        id = params.delete(:id)
-        expected_code = params.delete(:code)
+        id, expected_code, params = _rtr_prepare_params(params)
 
         puts "Attempting to update #{id} with #{params.inspect}" if @rack_test_rest[:debug]
 
@@ -104,10 +102,11 @@ module Rack
       end
 
       def delete_resource(params={})
-        delete "#{resource_uri}/#{params[:id]}#{@rack_test_rest[:extension]}"
+        id, code, params = _rtr_prepare_params(params)
+        delete "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
 
         with_clean_backtraces do
-          return handle_error_code(params[:code]) if params[:code]
+          return handle_error_code(code) if code
           assert_status_code(204)
         end
       end
@@ -167,6 +166,15 @@ module Rack
       end
 
     private
+
+      # split out common arguments & protect payload to ensure
+      # we don't modify it by reference
+      def _rtr_prepare_params(opts)
+        params = opts.dup
+        id = params.delete(:id)
+        code = params.delete(:code)
+        [id, code, params]
+      end
 
       def assert_content_type_is_json(response=last_response)
         # ignore character sets when evaluating content type

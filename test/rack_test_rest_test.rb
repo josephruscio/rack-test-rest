@@ -16,6 +16,25 @@ class TestRackTestRest < Minitest::Test
     }
   end
 
+  def test_read_resource
+    read_resource(id: 15)
+
+    # request
+    assert last_request.get?
+    assert_equal '/v1/users/15', last_request.path
+
+    # response
+    assert last_response.ok?
+  end
+
+  def test_read_should_not_modify_payload
+    payload = {id: 21, foo: 'bar', boom: 'baz'}
+    original = payload.dup
+
+    read_resource(payload)
+    assert_equal original, payload
+  end
+
   def test_update_resource
     touched = Time.now
     update_resource(id: 12, email: 'user@test.com', touched_at: touched)
@@ -28,6 +47,33 @@ class TestRackTestRest < Minitest::Test
 
     # response
     assert_equal 204, last_response.status
+  end
+
+  def test_update_should_not_modify_payload
+    payload = {id: 21, foo: 'bar', boom: 'baz'}
+    original = payload.dup
+
+    update_resource(payload)
+    assert_equal original, payload
+  end
+
+  def test_delete_resource
+    delete_resource(id: 21)
+
+    # request
+    assert last_request.delete?
+    assert_equal '/v1/users/21', last_request.path
+
+    # response
+    assert_equal 204, last_response.status
+  end
+
+  def test_delete_should_not_modify_payload
+    payload = {id: 21, foo: 'bar', boom: 'baz'}
+    original = payload.dup
+
+    delete_resource(payload)
+    assert_equal original, payload
   end
 
 end
