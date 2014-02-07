@@ -76,4 +76,19 @@ class TestRackTestRest < Minitest::Test
     assert_equal original, payload
   end
 
+  def test_should_accept_string_params
+    # param parsing is DRYed up now, so testing one route
+    # should be adequate
+
+    update_resource('id' => 34, 'email' => 'fred@idk.com')
+
+    # request
+    assert last_request.put?
+    assert_equal '/v1/users/34', last_request.path
+    assert_equal 'fred@idk.com', last_request.params['email']
+
+    # response
+    assert_equal 204, last_response.status
+  end
+
 end
