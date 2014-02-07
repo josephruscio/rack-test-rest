@@ -16,7 +16,7 @@ module Rack
       # unless the :code option is specified.
       #
       def create_resource(params={})
-        id, expected_code, params = _rtr_prepare_params(params)
+        expected_code, params = _rtr_prepare_params(params, no_id: true)
 
         puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
@@ -169,12 +169,14 @@ module Rack
 
       # split out common arguments & protect payload to ensure
       # we don't modify it by reference
-      def _rtr_prepare_params(opts)
+      def _rtr_prepare_params(params, opts={})
         # symbolize all keys & ensure we don't affect original object
-        params = opts.each_with_object({}) { |(k,v),memo| memo[k.to_sym] = v }
-        id = params.delete(:id)
-        code = params.delete(:code)
-        [id, code, params]
+        prep = params.each_with_object({}) { |(k,v),memo| memo[k.to_sym] = v }
+        result = []
+        result << prep.delete(:id) unless opts[:no_id]
+        result << prep.delete(:code)
+        result << prep
+        result
       end
 
       def assert_content_type_is_json(response=last_response)
