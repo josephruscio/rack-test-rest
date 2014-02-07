@@ -10,6 +10,7 @@ module Rack::Test::Rest
     end
 
     post '/v1/users' do
+      status 201
       headers 'Content-Type' => 'application/json'
       body '{}'
     end

@@ -16,6 +16,17 @@ class TestRackTestRest < Minitest::Test
     }
   end
 
+  def test_create_resource
+    create_resource(email: 'fred@sinatra.com', password: 'groovy')
+
+    # request
+    assert last_request.post?
+    assert_equal '/v1/users', last_request.path
+
+    # response
+    assert_equal 201, last_response.status
+  end
+
   def test_read_resource
     read_resource(id: 15)
 
