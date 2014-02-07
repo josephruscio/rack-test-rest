@@ -27,6 +27,11 @@ class TestRackTestRest < Minitest::Test
     assert_equal 201, last_response.status
   end
 
+  def test_create_resource_should_pass_id
+    create_resource(id: 101, email: 'fred@sinatra.com', password: 'groovy')
+    assert_equal "101", last_request.params['id']
+  end
+
   def test_read_resource
     read_resource(id: 15)
 
