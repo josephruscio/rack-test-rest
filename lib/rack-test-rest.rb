@@ -9,7 +9,7 @@ module Rack
       # if needed.
       #
       def resource_uri
-        "#{@rack_test_rest[:root_uri]}/#{@rack_test_rest[:resource]}"
+        "#{_rtr(:root_uri)}/#{_rtr(:resource)}"
       end
 
       # create a new instance of the given resource, expecting a 201
@@ -18,8 +18,8 @@ module Rack
       def create_resource(params={})
         id, expected_code, params = _rtr_prepare_params(params)
 
-        puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if _rtr_debug?
-        post "#{resource_uri}#{@rack_test_rest[:extension]}", params
+        puts "Posting to: '#{resource_uri}#{_rtr(:extension)}'" if _rtr_debug?
+        post "#{resource_uri}#{_rtr(:extension)}", params
 
         _rtr_clean_backtraces do
 
@@ -33,10 +33,10 @@ module Rack
           assert_status_code(201)
           assert_content_type_is_json
 
-          if @rack_test_rest[:location]
-            assert last_response.original_headers["Location"] =~ @rack_test_rest[:location],
+          if _rtr(:location)
+            assert last_response.original_headers["Location"] =~ _rtr(:location),
               "Response location header '%s' does not match RegExp '%s'" %
-              [last_response.original_headers["Location"], @rack_test_rest[:location]]
+              [last_response.original_headers["Location"], _rtr(:location)]
           end
 
         end
@@ -55,9 +55,9 @@ module Rack
         id, expected_code, params = _rtr_prepare_params(params)
 
         if id
-          uri = "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
+          uri = "#{resource_uri}/#{id}#{_rtr(:extension)}"
         else
-          uri = "#{resource_uri}#{@rack_test_rest[:extension]}"
+          uri = "#{resource_uri}#{_rtr(:extension)}"
         end
 
         puts "GET #{uri} #{params.inspect}" if _rtr_debug?
@@ -85,7 +85,7 @@ module Rack
 
         puts "Attempting to update #{id} with #{params.inspect}" if _rtr_debug?
 
-        put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
+        put "#{resource_uri}/#{id}#{_rtr(:extension)}", params
 
         _rtr_clean_backtraces do
           return _rtr_handle_code(expected_code) if expected_code
@@ -103,7 +103,7 @@ module Rack
 
       def delete_resource(params={})
         id, code, params = _rtr_prepare_params(params)
-        delete "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
+        delete "#{resource_uri}/#{id}#{_rtr(:extension)}"
 
         _rtr_clean_backtraces do
           return _rtr_handle_code(code) if code
@@ -149,8 +149,8 @@ module Rack
           pg_resp = read_resource(get_params)
 
           _rtr_clean_backtraces do
-            puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if _rtr_debug?
-            assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
+            puts "Received #{pg_resp[_rtr(:resource)].count} records" if _rtr_debug?
+            assert_equal(expected_length, pg_resp[_rtr(:resource)].count)
 
             puts "Found #{pg_resp["query"]["found"]} records" if _rtr_debug?
             assert_equal(total, pg_resp["query"]["found"])
@@ -167,8 +167,14 @@ module Rack
 
     private
 
+      # easy access to internal properties
+      def _rtr(key)
+        @rack_test_rest[key]
+      end
+
+      # debug mode?
       def _rtr_debug?
-        @rack_test_rest[:debug]
+        !!@rack_test_rest[:debug]
       end
 
       # split out common arguments & protect payload to ensure
