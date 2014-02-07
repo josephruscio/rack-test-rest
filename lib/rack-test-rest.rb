@@ -170,7 +170,8 @@ module Rack
       # split out common arguments & protect payload to ensure
       # we don't modify it by reference
       def _rtr_prepare_params(opts)
-        params = opts.dup
+        # symbolize all keys & ensure we don't affect original object
+        params = opts.each_with_object({}) { |(k,v),memo| memo[k.to_sym] = v }
         id = params.delete(:id)
         code = params.delete(:code)
         [id, code, params]
