@@ -18,14 +18,14 @@ module Rack
       def create_resource(params={})
         id, expected_code, params = _rtr_prepare_params(params)
 
-        puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
+        puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if _rtr_debug?
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
 
         _rtr_clean_backtraces do
 
           return _rtr_handle_code(expected_code) if expected_code
 
-          if @rack_test_rest[:debug]
+          if _rtr_debug?
             puts "#{last_response.status}: #{last_response.body}"
             puts last_response.original_headers["Location"]
           end
@@ -60,14 +60,14 @@ module Rack
           uri = "#{resource_uri}#{@rack_test_rest[:extension]}"
         end
 
-        puts "GET #{uri} #{params.inspect}" if @rack_test_rest[:debug]
+        puts "GET #{uri} #{params.inspect}" if _rtr_debug?
         get uri, params
 
         _rtr_clean_backtraces do
 
           return _rtr_handle_code(expected_code) if expected_code
 
-          if @rack_test_rest[:debug]
+          if _rtr_debug?
             puts "Code: #{last_response.status}"
             puts "Body: #{last_response.body}"
           end
@@ -83,13 +83,13 @@ module Rack
       def update_resource(params={})
         id, expected_code, params = _rtr_prepare_params(params)
 
-        puts "Attempting to update #{id} with #{params.inspect}" if @rack_test_rest[:debug]
+        puts "Attempting to update #{id} with #{params.inspect}" if _rtr_debug?
 
         put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
         _rtr_clean_backtraces do
           return _rtr_handle_code(expected_code) if expected_code
-          puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
+          puts "#{last_response.status}: #{last_response.body}" if _rtr_debug?
           assert_status_code(204)
         end
       end
@@ -140,7 +140,7 @@ module Rack
 
           expected_length = (length > (total - retrieved)) ? (total - retrieved) : length
 
-          if @rack_test_rest[:debug]
+          if _rtr_debug?
             puts "Requesting offset='#{offset}', length='#{length}'"
             puts "Expecting '#{expected_length}'"
           end
@@ -149,10 +149,10 @@ module Rack
           pg_resp = read_resource(get_params)
 
           _rtr_clean_backtraces do
-            puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
+            puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if _rtr_debug?
             assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
 
-            puts "Found #{pg_resp["query"]["found"]} records" if @rack_test_rest[:debug]
+            puts "Found #{pg_resp["query"]["found"]} records" if _rtr_debug?
             assert_equal(total, pg_resp["query"]["found"])
 
             assert_equal(total, pg_resp["query"]["total"])
@@ -166,6 +166,10 @@ module Rack
       end
 
     private
+
+      def _rtr_debug?
+        @rack_test_rest[:debug]
+      end
 
       # split out common arguments & protect payload to ensure
       # we don't modify it by reference
@@ -191,7 +195,7 @@ module Rack
       def _rtr_handle_code(code)
         assert_status_code(code)
 
-        if @rack_test_rest[:debug]
+        if _rtr_debug?
           puts "Status: #{last_response.status}"
           puts "Headers:"
           puts last_response.headers.inspect
