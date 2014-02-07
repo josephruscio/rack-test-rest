@@ -21,9 +21,9 @@ module Rack
         puts "Posting to: '#{resource_uri}#{@rack_test_rest[:extension]}'" if @rack_test_rest[:debug]
         post "#{resource_uri}#{@rack_test_rest[:extension]}", params
 
-        with_clean_backtraces do
+        _rtr_clean_backtraces do
 
-          return handle_error_code(expected_code) if expected_code
+          return _rtr_handle_code(expected_code) if expected_code
 
           if @rack_test_rest[:debug]
             puts "#{last_response.status}: #{last_response.body}"
@@ -63,9 +63,9 @@ module Rack
         puts "GET #{uri} #{params.inspect}" if @rack_test_rest[:debug]
         get uri, params
 
-        with_clean_backtraces do
+        _rtr_clean_backtraces do
 
-          return handle_error_code(expected_code) if expected_code
+          return _rtr_handle_code(expected_code) if expected_code
 
           if @rack_test_rest[:debug]
             puts "Code: #{last_response.status}"
@@ -87,8 +87,8 @@ module Rack
 
         put "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
-        with_clean_backtraces do
-          return handle_error_code(expected_code) if expected_code
+        _rtr_clean_backtraces do
+          return _rtr_handle_code(expected_code) if expected_code
           puts "#{last_response.status}: #{last_response.body}" if @rack_test_rest[:debug]
           assert_status_code(204)
         end
@@ -105,8 +105,8 @@ module Rack
         id, code, params = _rtr_prepare_params(params)
         delete "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
 
-        with_clean_backtraces do
-          return handle_error_code(code) if code
+        _rtr_clean_backtraces do
+          return _rtr_handle_code(code) if code
           assert_status_code(204)
         end
       end
@@ -148,7 +148,7 @@ module Rack
           get_params = read_params.merge(offset: offset, length: length)
           pg_resp = read_resource(get_params)
 
-          with_clean_backtraces do
+          _rtr_clean_backtraces do
             puts "Received #{pg_resp[@rack_test_rest[:resource]].count} records" if @rack_test_rest[:debug]
             assert_equal(expected_length, pg_resp[@rack_test_rest[:resource]].count)
 
@@ -188,7 +188,7 @@ module Rack
           "Expected status #{code}, but got a #{last_response.status}.\nBody: #{last_response.body.empty? ? "empty" : last_response.body.inspect.chomp}"
       end
 
-      def handle_error_code(code)
+      def _rtr_handle_code(code)
         assert_status_code(code)
 
         if @rack_test_rest[:debug]
@@ -208,7 +208,7 @@ module Rack
 
       # remove library lines from call stack so error is reported
       # where the call to rack-test-rest is being made
-      def with_clean_backtraces
+      def _rtr_clean_backtraces
         yield
       rescue MiniTest::Assertion => error
         cleaned = error.backtrace.reject do |line|
