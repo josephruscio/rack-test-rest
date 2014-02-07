@@ -1,3 +1,4 @@
+require 'json'
 require 'rack-test-rest/version'
 
 module Rack
