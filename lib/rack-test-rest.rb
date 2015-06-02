@@ -103,7 +103,7 @@ module Rack
 
       def delete_resource(params={})
         id, code, params = _rtr_prepare_params(params)
-        delete "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}"
+        delete "#{resource_uri}/#{id}#{@rack_test_rest[:extension]}", params
 
         with_clean_backtraces do
           return handle_error_code(code) if code

@@ -84,6 +84,11 @@ class TestRackTestRest < Minitest::Test
     assert_equal 204, last_response.status
   end
 
+  def test_delete_with_params
+    delete_resource(id: 21, foo: 'bar')
+    assert_equal 'bar', last_request.params['foo']
+  end
+
   def test_delete_should_not_modify_payload
     payload = {id: 21, foo: 'bar', boom: 'baz'}
     original = payload.dup
